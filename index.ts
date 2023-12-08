@@ -4,7 +4,9 @@ var cors:any = require('cors');
 
  import auth from './middleware/auth';
 
+
 import userRoute from './routes/user.routes'
+import adminroute from './routes/admin.route'
 import memberRoute from './routes/member.routes'
 // import {validationError} from './helpers/validator.controller';
 
@@ -13,7 +15,7 @@ const app=express();
 app.options('*', cors());
 const server = require('http').createServer(app);
 
-const port =process.env.PORT||4000;
+const port =process.env.PORT||7777;
 app.get("/", function (req,res) {
   res.send("Response from the GET request")
   });
@@ -30,6 +32,9 @@ app.use("/profile", express.static(__dirname + "/profile"));
 //  app.use('/api/v1',)
  app.use('/api/v1/auth',userRoute);
  app.use('/api/v1/member',auth,memberRoute);
+ app.use('/api/v1/member',auth,memberRoute);
+ app.use('/api/v1/admin',auth,adminroute);
+
  app.get("/api/v1/welcome", auth, (req, res) => {
   res.status(200).send("data get successfully ");
 });

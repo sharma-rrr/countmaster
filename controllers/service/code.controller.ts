@@ -36,11 +36,14 @@ const { SECRET_KEY } = require('../../appconfig')
 const jwt = require('jsonwebtoken')
 import commonController from '../common/common.controller';
 // import { body, Result } from 'express-validator';
-import { exists } from 'fs';
+import { exists, readSync } from 'fs';
 import { Encrypt } from '../common/encryptpassword';
 import { error } from 'console';
 import { TokenExpiredError } from 'jsonwebtoken';
 import { ResolveOptions } from 'dns';
+import { rejects } from 'assert';
+import { data } from 'jquery';
+import { and } from 'sequelize';
 class CodeController {
 
     ///Section User Start
@@ -48,10 +51,13 @@ class CodeController {
 async addNewUser(payload: any, res: Response) {
     const { id, uniqueid,purchaseapp } = payload;
     try {
-        if (id === null || id === undefined) {
+        console.log(id.length,"ghhhfffff")
+        if (id.length  <= 0 ) {    
+
             const sun = commonController.generateString(6);
+            var abc="ATCM"+sun
             const newUser = await db.Users.create({
-                 uniqueid: sun,purchaseapp:true,
+                 uniqueid: abc,purchaseapp:false,
                  });
             commonController.successMessage(newUser, "Unique ID is created", res);
 
@@ -64,12 +70,12 @@ async addNewUser(payload: any, res: Response) {
             if (foundUser) {
                 commonController.successMessage(foundUser, "User information retrieved", res);
             } else {
-                commonController.errorMessage("User not found", res);
+                commonController.successMessage({},"User not found", res);
             }
         }
     } catch (error) {
         console.error(error);
-        return commonController.errorMessage("An error occurred", res);
+        return commonController.successMessage({},"An error occurred", res);
     }
 }
 
@@ -77,22 +83,24 @@ async addNewUser(payload: any, res: Response) {
 //update   purchaseapp and playlable users
 async updatedata(payload:any,res:Response){
     const{uniqueid,purchaseapp,playlable}=payload;
+    console.log(payload,"dghhj")
     try{
         const sun=await db.Users.findOne({
             where:{
                 uniqueid
             }
         })
+        console.log(sun,"dhhjh")
         if(uniqueid){
             await sun.update({
                 purchaseapp,playlable
             })
             commonController.successMessage(sun,"update data sucefuuly",res)
         }else{
-            commonController.errorMessage("data not update sucefully",res)
+            commonController.successMessage({},"data not update sucefully",res)
         }
     }catch(error){
-        commonController.errorMessage("occuerd err",res)
+        commonController.successMessage({},"occuerd err",res)
     }
 }
     
@@ -108,7 +116,7 @@ async playtime(payload: any, res: Response) {
         })
 
        if(!sun){
-       commonController.errorMessage("unique id not found",res) 
+       commonController.successMessage({},"unique id not found",res) 
    }
       else{
         const newPlaytimeEntry = await db.Averagetime.create({
@@ -135,7 +143,7 @@ async clickdata(payload:any,res:Response){
             }
          })
          if(!moon){
-            commonController.errorMessage("unique id not found",res)
+            commonController.successMessage({},"unique id not found",res)
          }
             const sun=await db.Add.create({
                 userid:moon.id,show,click
@@ -147,6 +155,253 @@ async clickdata(payload:any,res:Response){
       }
 }
     
+
+// admin login api 
+
+async adminlogin(payload:any,res:Response){
+    const{email,password,}=payload;
+    console.log(payload,"sdffggggff")
+    try{
+        if (email === 'admin@mail.com' && password === 'admin123') {
+            const token = jwt.sign({
+                email,admin:true,
+
+            }, process.env.TOKEN_SECRET);
+            commonController.successMessage(token,"token created",res)
+
+        } else {
+
+            commonController.errorMessage( 'Invalid email or password' ,res);
+        }
+        
+
+    }catch(error){
+        commonController.errorMessage("occuerd error",res)
+    }
+}
+
+
+//user login
+async userlogin(payload: any, res: Response) {
+    const { email, password, id } = payload;
+    console.log(payload,"dsghsgh")
+
+    try {
+    
+        const userData = await db.aUsers.findOne({
+            where: {
+                email
+            }
+        });
+
+        if (userData) {
+            if (userData.password == password) {
+                const token = jwt.sign({
+                    email,
+                    id:userData.id
+                }, process.env.TOKEN_SECRET);
+
+                commonController.successMessage(token, "User login", res);
+            } else {
+            
+                commonController.errorMessage("Invalid password", res);
+            }
+        } else {
+          
+            commonController.errorMessage("User not found", res);
+        }
+    } catch (error) {
+        console.error("Error:", error);
+        commonController.errorMessage("An error occurred", res);
+    }
+}
+
+
+// get all users particular data
+
+
+async  getallusers(payload, res) {
+  try {
+    var sql = `SELECT * FROM Users WHERE purchaseapp = 1`;
+    var data = await MyQuery.query(sql, { type: QueryTypes.SELECT });
+       commonController.successMessage(data,"get data zero",res)
+      
+  } catch (error) {
+    console.error('Error:', error);
+    commonController.errorMessage('An error occurred', res);
+  }
+}
+
+
+// get particular data users and total show and count data  both tables get data ADDS AND USERS
+async  getallcount(payload:any,res:Response){
+    try {
+        console.log("fhyhuu")
+        const sqlQuery = `
+        SELECT 
+    u.id AS adds,
+    u.uniqueid,
+    u.playlable,
+    u.purchaseapp,
+    COALESCE(SUM(a.show), 0) AS total_show_count,
+    COALESCE(SUM(a.click), 0) AS total_click_count,
+    COALESCE(SUM(b.time), 0) AS total_time_count,
+    COALESCE(SUM(CASE WHEN DATE(b.createdAt) = CURDATE() THEN b.time ELSE 0 END), 0) AS todayTotalTime
+FROM 
+    Users u
+LEFT JOIN 
+    Adds a ON u.id = a.userid
+LEFT JOIN 
+    Averagetimes b ON u.id = b.userid
+GROUP BY 
+    u.id, u.uniqueid, u.playlable, u.purchaseapp;
+
+    `;
+        var data = await MyQuery.query(sqlQuery, { type: QueryTypes.SELECT });
+
+        const totalUsersSQL = `SELECT count(*) AS total FROM Users`;
+        const totalUsersData = await MyQuery.query(totalUsersSQL, { type: QueryTypes.SELECT });
+
+        // Query to get the count of users created today
+        const todayDate = new Date().toISOString().split('T')[0];
+        const todayUsersSQL = `SELECT count(*) AS total FROM Users WHERE DATE(createdAt) = '${todayDate}'`;
+        const todayUsersData = await MyQuery.query(todayUsersSQL, { type: QueryTypes.SELECT });
+        commonController.successMessage({data,totalUsersData,todayUsersData},"get data particular users",res)
+    
+    } catch (error) {
+        // Handle errors
+        console.error('Error:', error);
+        commonController.errorMessage("An error occurred", res);
+    }
+}
+
+
+
+
+
+// get all data average time
+
+async getTime(payload: any, res: Response) {
+    const { id, } = payload;
+    console.log(id,"id....")
+    try {
+       const sun=await db.Users.findOne({
+        where:{
+            uniqueid:id
+        }
+       })
+       
+       if(!sun){
+        commonController.errorMessage("data not found",res)
+       }
+        const moon=await db.Averagetime.findAll({
+            where:{
+                userid:sun.id
+            }
+        })
+        commonController.successMessage(moon, " data successfully", res);
+    } catch (error) {
+        console.error('Error:', error);
+        commonController.errorMessage("An error occurred", res);
+    }
+}
+
+// get all users count
+async  getusers(payload: any, res: Response) {
+    try {
+        // Query to get all user data
+        const allUsersSQL = `SELECT * FROM Users`;
+        const allUsersData = await MyQuery.query(allUsersSQL, { type: QueryTypes.SELECT });
+
+        // Query to get the total count of users
+        const totalUsersSQL = `SELECT count(*) AS total FROM Users`;
+        const totalUsersData = await MyQuery.query(totalUsersSQL, { type: QueryTypes.SELECT });
+
+        // Query to get the count of users created today
+        const todayDate = new Date().toISOString().split('T')[0];
+        const todayUsersSQL = `SELECT count(*) AS total FROM Users WHERE DATE(createdAt) = '${todayDate}'`;
+        const todayUsersData = await MyQuery.query(todayUsersSQL, { type: QueryTypes.SELECT });
+
+        // Prepare the response object with all users data, total count, and today's count
+        const responseData = {
+            allUsers: allUsersData,
+            totalUsersData,todayUsersData
+        };
+
+        // Send the combined response
+        commonController.successMessage(responseData, "User data and counts", res);
+
+    } catch (error) {
+        commonController.errorMessage("An error occurred", res);
+    }
+}
+
+
+
+
+
+
+// change email
+async changeEmail(payload:any,res:Response){
+    const{email,newemail}=payload;
+    console.log(payload,"dvfg")
+    try{
+        const moon=await db.aUsers.findOne({
+            where:{
+                email
+            }
+        })
+        if(moon){
+            await moon.update({
+                email:newemail,active:0
+            })
+            commonController.successMessage(moon,"change email adrees sucsfuuly",res)
+        }else{
+            commonController.errorMessage("email adress not sucesfully change",res)
+        }
+    
+    }catch(error){
+        commonController.errorMessage("occuerd error",res)
+    }
+     
+      
+}
+
+// password change 
+
+async passwordchange(payload: any, res: Response) {
+    const { id, password, newPassword } = payload;
+    console.log("hjhj",payload)
+
+    try {
+        const userData = await db.aUsers.findOne({
+            where: {
+                id: 1 
+            }
+        });
+
+        if (userData) { 
+            if (password === userData.password) {
+                await userData.update({
+                    password: newPassword
+                });
+
+                commonController.successMessage(userData, 'Password changed successfully', res);
+            } else {
+                commonController.errorMessage('Invalid password', res);
+            }
+        } else {
+            commonController.errorMessage('User not found', res);
+        }
+    } catch (error) {
+        console.error("Error:", error);
+        commonController.errorMessage('An error occurred', res);
+    }
+}
+
+
+
+
         async verify(payload: any, res: Response) {
             try {
                 const { email,otp} = payload;
@@ -383,7 +638,7 @@ async clickdata(payload:any,res:Response){
             console.log(checkdata.emailId);
         } else {
             commonController.errorMessage("data not update", res)
-            console.log("not found");
+          
         }
     }
 
@@ -393,7 +648,7 @@ async clickdata(payload:any,res:Response){
         const { id, password ,newPassword} = payload;
         var hash = await Encrypt.cryptPassword(password.toString());
         //Check If Email Exists
-        var checkdata = await db.Users.findOne({
+        var checkdata = await db.aUsers.findOne({
             where: {
             id
 
@@ -423,8 +678,6 @@ async clickdata(payload:any,res:Response){
         else {
             commonController.errorMessage("Email password not match", res)
             console.log("no");
-
-
         }
 } 
         // find all users

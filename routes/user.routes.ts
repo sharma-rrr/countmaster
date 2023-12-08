@@ -17,6 +17,7 @@ import express from 'express';
  })
 
 const router=express.Router();
+// add data 
  router.post("/register",userController.register);
  //update purchase app 
  router.post("/updatepurchaseapp",userController.update);
@@ -24,6 +25,20 @@ const router=express.Router();
  router.post("/addplaytime",userController.addplaytime);
  //add  play show and click
  router.post("/playshow",userController.showdata);
+ // login api admin
+ router.post("/adminlogin",userController.adminlogin);
+
+ //login api admin user login
+ router.post("/adminuserlogin",userController.userlogin);
+
+
+ // change email
+router.post("/changeemail",userController.changeEmail);
+
+
+ // change password
+router.post("/change",userController.Passwordchange);
+ 
 
 
 

@@ -2,10 +2,11 @@ import { Request, Response } from 'express';
 import codeController from './service/code.controller';
 import commonController from './common/common.controller';
 import { sign, verify } from 'crypto';
+import { Pay } from 'twilio/lib/twiml/VoiceResponse';
 // import userController from "../controllers/user.controller";
 class UserController {
     // add api 
-    async register(req: Request, res: Response) {
+    async   register(req: Request, res: Response) {
         try {
             const {id} = req.body;
             await codeController.addNewUser({
@@ -39,7 +40,7 @@ class UserController {
             const {uniqueid,time} = req.body;
             await codeController.playtime({
                time,uniqueid
-               
+            
                 }, res)
         
         } catch (e) {
@@ -60,6 +61,113 @@ async showdata(req:Request,res:Response){
         commonController.errorMessage("occuerd error",res)
     }
 }
+
+// admin login 
+async adminlogin(req:Request,res:Response){
+    try{
+        const{email,password}=req.body;
+        await codeController.adminlogin({
+        email,password
+        },res)
+    }catch(error){
+        commonController.errorMessage("occured error",res)
+    }
+}
+
+ async userlogin(req:Request,res:Response){
+    try{
+        const{email,password}=req.body;
+        await codeController.userlogin({
+        email,password
+        },res)
+    }catch(error){
+        commonController.errorMessage("occured error",res)
+    }
+}
+
+
+
+// get all users 
+
+async getuser(req:Request,res:Response){
+    try{
+        await codeController.getallusers({
+    
+        },res)
+
+    }catch(error){
+        commonController.errorMessage("occured error",res)
+    }
+}
+
+// get particular data conut
+async gettotalcount(req:Request,res:Response){
+    try{
+
+    await codeController.getallcount({
+
+    },res)
+}catch(error){
+    commonController.errorMessage("occuerd error",res)
+}
+}
+
+// get all data from average table
+
+async totaldata(req:Request,res:Response){
+  try{
+    const{id}=req.body;
+    await codeController.getTime({
+        id
+    },res)
+  }catch(error){
+    commonController.errorMessage("occuerd error",res)
+  }
+
+}
+
+
+// get total users 
+async gettotalusers(req:Request,res:Response){
+    await codeController.getusers({
+        
+    },res)
+}
+
+
+
+
+
+// change email adrees
+async changeEmail(req:Request,res:Response){
+
+    try{
+      const{email,newemail,}=req.body;
+      await codeController.changeEmail({
+          email,newemail
+      },res)
+    }catch(error){
+      commonController.errorMessage("occuerd error",res)
+    }
+  
+  }
+  
+  // change password
+
+  async Passwordchange(req:Request,res:Response){
+    try{
+        const{id,password,newPassword,}=req.body;
+        await codeController.passwordchange({
+        password,newPassword,id
+        },res)
+
+
+    }catch(error){
+        commonController.errorMessage("occuerd error",res)
+    }
+  }
+
+
    
     async verify(req: Request, res: Response) {
         try {
