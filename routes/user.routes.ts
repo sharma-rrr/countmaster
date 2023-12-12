@@ -25,6 +25,12 @@ const router=express.Router();
  router.post("/addplaytime",userController.addplaytime);
  //add  play show and click
  router.post("/playshow",userController.showdata);
+
+ // get all time count particular users try
+ router.post("/get",userController.getdata);
+
+
+ // ADMIN API'S
  // login api admin
  router.post("/adminlogin",userController.adminlogin);
 
@@ -45,7 +51,9 @@ router.post("/change",userController.Passwordchange);
 
 
 
- 
+
+
+
  router.post("/verify",userController.verify);
    router.post("/login",userController.login);
    router.post("/forgot-Password",userController.forgotPassword);

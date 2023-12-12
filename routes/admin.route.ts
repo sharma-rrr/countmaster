@@ -19,19 +19,39 @@ import express from 'express';
 const router=express.Router()
 
 // admin api 
+
 router.post("/getallusers",userController.getuser);
 
 
 // getall count show and total click count of particular users
+// and get all users data and total count  users and total today users count
 router.post("/getuserscount",userController.gettotalcount);
 
 
 //get all data from average table
 router.post("/gettotal",userController.totaldata);
 
-// get  all user and get total users count and  get today USER
+// get  all user and get total users count and  get today USER demo
 router.post("/getdatatotaluser",userController.gettotalusers);
 
+
+
+
+
+
+//  get total time particular users
+//  SELECT
+//     u.uniqueid,
+//     a.userid,
+//     SUM(a.time) AS total_time
+// FROM
+//     Users u
+// LEFT JOIN
+//     Averagetimes a ON u.id = a.userid
+// WHERE
+//     u.uniqueid = 'ATCMSrmwRe'
+// GROUP BY
+//     u.uniqueid, a.userid;
 
 
 

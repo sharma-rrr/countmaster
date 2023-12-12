@@ -62,6 +62,18 @@ async showdata(req:Request,res:Response){
     }
 }
 
+// get all particular data  from average time users
+async getdata(req:Request,res:Response){
+    try{
+
+        await codeController.dataget({
+          
+        },res)
+      
+          }catch(err){
+              commonController.errorMessage("occuerd error",res)
+          }
+      }
 // admin login 
 async adminlogin(req:Request,res:Response){
     try{
@@ -106,7 +118,7 @@ async gettotalcount(req:Request,res:Response){
 
     await codeController.getallcount({
 
-    },res)
+    },res) 
 }catch(error){
     commonController.errorMessage("occuerd error",res)
 }

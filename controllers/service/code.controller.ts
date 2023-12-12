@@ -53,7 +53,6 @@ async addNewUser(payload: any, res: Response) {
     try {
         console.log(id.length,"ghhhfffff")
         if (id.length  <= 0 ) {    
-
             const sun = commonController.generateString(6);
             var abc="ATCM"+sun
             const newUser = await db.Users.create({
@@ -123,7 +122,6 @@ async playtime(payload: any, res: Response) {
             userid:sun.id,
              time
         });
-
         commonController.successMessage(newPlaytimeEntry, "Playtime added successfully", res);
       }  
       
@@ -132,6 +130,8 @@ async playtime(payload: any, res: Response) {
         commonController.errorMessage("An error occurred", res);
     }
 }
+
+
 
 //  add show and click  data
 async clickdata(payload:any,res:Response){
@@ -154,6 +154,32 @@ async clickdata(payload:any,res:Response){
         commonController.errorMessage("occured error",res)
       }
 }
+
+// get all data 
+async dataget(payload:any,res:Response){
+        try {
+            const sql = `
+                SELECT
+                    u.id, 
+                    u.uniqueid,
+                    a.userid ,
+                    SUM(a.time) AS total_time
+                FROM
+                    Users u
+                LEFT JOIN
+                    Averagetimes a ON u.id = a.userid
+                GROUP BY
+                    u.uniqueid, a.userid;
+            `;
+            var data = await MyQuery.query(sql, { type: QueryTypes.SELECT });
+            commonController.successMessage(data,"get data sucefully",res)
+        } catch (error) {
+            console.error("Error occurred while fetching data:", error);
+          commonController.errorMessage("error occuerd",res)
+        }
+    
+
+}
     
 
 // admin login api 
@@ -174,7 +200,6 @@ async adminlogin(payload:any,res:Response){
             commonController.errorMessage( 'Invalid email or password' ,res);
         }
         
-
     }catch(error){
         commonController.errorMessage("occuerd error",res)
     }
@@ -185,9 +210,7 @@ async adminlogin(payload:any,res:Response){
 async userlogin(payload: any, res: Response) {
     const { email, password, id } = payload;
     console.log(payload,"dsghsgh")
-
     try {
-    
         const userData = await db.aUsers.findOne({
             where: {
                 email
@@ -218,13 +241,11 @@ async userlogin(payload: any, res: Response) {
 
 
 // get all users particular data
-
-
 async  getallusers(payload, res) {
   try {
     var sql = `SELECT * FROM Users WHERE purchaseapp = 1`;
     var data = await MyQuery.query(sql, { type: QueryTypes.SELECT });
-       commonController.successMessage(data,"get data zero",res)
+       commonController.successMessage(data,"get  purchase data ",res)
       
   } catch (error) {
     console.error('Error:', error);
@@ -255,19 +276,15 @@ LEFT JOIN
     Averagetimes b ON u.id = b.userid
 GROUP BY 
     u.id, u.uniqueid, u.playlable, u.purchaseapp;
-
     `;
         var data = await MyQuery.query(sqlQuery, { type: QueryTypes.SELECT });
-
         const totalUsersSQL = `SELECT count(*) AS total FROM Users`;
-        const totalUsersData = await MyQuery.query(totalUsersSQL, { type: QueryTypes.SELECT });
-
+        const totalUsersData = await MyQuery.query(totalUsersSQL,{ type: QueryTypes.SELECT });
         // Query to get the count of users created today
         const todayDate = new Date().toISOString().split('T')[0];
         const todayUsersSQL = `SELECT count(*) AS total FROM Users WHERE DATE(createdAt) = '${todayDate}'`;
         const todayUsersData = await MyQuery.query(todayUsersSQL, { type: QueryTypes.SELECT });
         commonController.successMessage({data,totalUsersData,todayUsersData},"get data particular users",res)
-    
     } catch (error) {
         // Handle errors
         console.error('Error:', error);
@@ -280,7 +297,6 @@ GROUP BY
 
 
 // get all data average time
-
 async getTime(payload: any, res: Response) {
     const { id, } = payload;
     console.log(id,"id....")
@@ -306,12 +322,14 @@ async getTime(payload: any, res: Response) {
     }
 }
 
+
+
 // get all users count
 async  getusers(payload: any, res: Response) {
     try {
         // Query to get all user data
         const allUsersSQL = `SELECT * FROM Users`;
-        const allUsersData = await MyQuery.query(allUsersSQL, { type: QueryTypes.SELECT });
+        const allUsersData = await MyQuery.query(allUsersSQL,{ type: QueryTypes.SELECT });
 
         // Query to get the total count of users
         const totalUsersSQL = `SELECT count(*) AS total FROM Users`;
@@ -327,10 +345,8 @@ async  getusers(payload: any, res: Response) {
             allUsers: allUsersData,
             totalUsersData,todayUsersData
         };
-
         // Send the combined response
         commonController.successMessage(responseData, "User data and counts", res);
-
     } catch (error) {
         commonController.errorMessage("An error occurred", res);
     }
@@ -372,7 +388,6 @@ async changeEmail(payload:any,res:Response){
 async passwordchange(payload: any, res: Response) {
     const { id, password, newPassword } = payload;
     console.log("hjhj",payload)
-
     try {
         const userData = await db.aUsers.findOne({
             where: {
@@ -421,7 +436,6 @@ async passwordchange(payload: any, res: Response) {
                 console.log(checkOtp,"ss")
                 if (checkOtp) {
                     if (checkOtp.otpValue == otp) {
-    
                         await checkOtp.update({ active: false });
                         commonController.successMessage({}, "Otp Verified", res)
     
@@ -433,8 +447,8 @@ async passwordchange(payload: any, res: Response) {
                 commonController.errorMessage;
             }
         }
-    // login user
 
+    // login user
     async loginUser(payload: any, res: Response) {
         const { email, password } = payload;
         console.log(payload,"pa")
@@ -712,7 +726,6 @@ async passwordchange(payload: any, res: Response) {
            
         // }
 
-
        // delete user
        
        async deleteUser(payload: any, res: Response) {
@@ -725,8 +738,6 @@ async passwordchange(payload: any, res: Response) {
             }
         })
         if (checkdata) {
-        
-          
              var result =checkdata.destroy({
                 where: {
                    emailId:emailId
