@@ -30,9 +30,15 @@ const router=express.Router();
  router.post("/get",userController.getdata);
 
 
+
+ 
+
+ 
  // ADMIN API'S
  // login api admin
  router.post("/adminlogin",userController.adminlogin);
+
+
 
  //login api admin user login
  router.post("/adminuserlogin",userController.userlogin);
@@ -44,6 +50,25 @@ router.post("/changeemail",userController.changeEmail);
 
  // change password
 router.post("/change",userController.Passwordchange);
+
+
+//get  all  purchase app  data like one from users table
+router.post("/getallusers",userController.getuser);
+
+
+// getall count show and total click count of particular users
+// and get all users data and total count  users and total today users count
+router.post("/getuserscount",userController.gettotalcount);
+
+
+// /
+router.post("/filter",userController.filter);
+
+
+   
+
+
+
  
 
 

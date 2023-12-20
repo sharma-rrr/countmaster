@@ -18,6 +18,7 @@ class CommonController {
     generateOtp(){
         return Math.floor(100000 + Math.random() * 900000);
     }
+    
     cryptPassword ( password) {
        bcrypt.genSalt(10, function(err, salt) {
         if (err) 
@@ -36,6 +37,7 @@ class CommonController {
                err;
        });
     };
+    
     successMessage(data: any, msg: string, res: Response) {
         try{
         return res.status(200).send({
@@ -45,6 +47,7 @@ class CommonController {
             console.log(e);
         }
     }
+
     errorMessage(msg: string, res: Response) {
        try{
         return res.status(400).send({

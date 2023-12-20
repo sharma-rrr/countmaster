@@ -8,16 +8,19 @@ class UserController {
     // add api 
     async   register(req: Request, res: Response) {
         try {
+
             const {id} = req.body;
             await codeController.addNewUser({
                  id
                 }, res)
         
+                
         } catch (e) {
             console.log(e)
             commonController.errorMessage("user not register", res)
         }
     }
+
 
     // update user data 
     async update(req: Request, res: Response) {
@@ -34,15 +37,15 @@ class UserController {
         }
     }
 
+
     // add play time entry
      async addplaytime(req: Request, res: Response) {
         try {
             const {uniqueid,time} = req.body;
             await codeController.playtime({
                time,uniqueid
-            
+
                 }, res)
-        
         } catch (e) {
             console.log(e)
             commonController.errorMessage("user not register", res)
@@ -74,6 +77,10 @@ async getdata(req:Request,res:Response){
               commonController.errorMessage("occuerd error",res)
           }
       }
+
+      
+
+
 // admin login 
 async adminlogin(req:Request,res:Response){
     try{
@@ -115,22 +122,37 @@ async getuser(req:Request,res:Response){
 // get particular data conut
 async gettotalcount(req:Request,res:Response){
     try{
-
     await codeController.getallcount({
-
     },res) 
 }catch(error){
+    
     commonController.errorMessage("occuerd error",res)
 }
 }
 
-// get all data from average table
+// 
+async filter(req:Request,res:Response){
+    try{
 
+        await codeController.filter({
+
+
+        },res)
+
+    }catch(error){
+        commonController.errorMessage("occuerd error",res)
+    }
+}
+
+
+
+// get all data from average table
 async totaldata(req:Request,res:Response){
   try{
     const{id}=req.body;
     await codeController.getTime({
         id
+        
     },res)
   }catch(error){
     commonController.errorMessage("occuerd error",res)
@@ -150,9 +172,16 @@ async gettotalusers(req:Request,res:Response){
 
 
 
+
+
+
+
+
+
+
+
 // change email adrees
 async changeEmail(req:Request,res:Response){
-
     try{
       const{email,newemail,}=req.body;
       await codeController.changeEmail({
@@ -163,11 +192,12 @@ async changeEmail(req:Request,res:Response){
     }
   
   }
+
   
   // change password
-
   async Passwordchange(req:Request,res:Response){
     try{
+
         const{id,password,newPassword,}=req.body;
         await codeController.passwordchange({
         password,newPassword,id
@@ -179,27 +209,26 @@ async changeEmail(req:Request,res:Response){
     }
   }
 
+  
+
 
    
     async verify(req: Request, res: Response) {
         try {
             const {email,otp} = req.body;
             console.log(req.body)
-          
-
                 await codeController.verify({
                     email,otp
                 }, res)
             
-
-
         } catch (e) {
             console.log(e)
             commonController.errorMessage("user not register", res)
         }
     }
-    //  user login
 
+
+    //  user login
     async login(req: Request, res: Response) {
         try {
             const { email, password } = req.body;
@@ -209,9 +238,10 @@ async changeEmail(req:Request,res:Response){
             }, res)
         } catch (e) {
             commonController.errorMessage("user not login", res)
-
+ 
         }
     }
+
 
     //verify user
     async verifyCode(req: Request, res: Response) {
@@ -227,9 +257,11 @@ async changeEmail(req:Request,res:Response){
 
         }
     }
+
+
+
     
     //forgot Password
-    
     async forgotPassword(req: Request, res: Response) {
         try {
             const { emailId } = req.body;
@@ -247,18 +279,15 @@ async changeEmail(req:Request,res:Response){
     async updatePassword(req: Request, res: Response) {
         try {
             const {  emailId,otp, password, confirmPassword } = req.body;
+
             if (password != confirmPassword) {
                 commonController.errorMessage("Password Not Matched", res);
-               
             }
-           
             else {
-
                 await codeController.updatePassword({
                      emailId,otp,password
                 }, res)
             }
-
 
         } catch (e) {
             console.log(e)
@@ -289,8 +318,9 @@ async newPassword(req: Request, res: Response) {
         commonController.errorMessage("not update", res)
     }
 } 
+
+
   // Get User By Id
-  
   async getByUserId(req: Request, res: Response) {
     try {
         const { emailId } = req.body;
@@ -304,8 +334,8 @@ async newPassword(req: Request, res: Response) {
 
     }
 }
+
   // update profile
-  
   async updateProfile(req: Request, res: Response) {
     try {
         const { emailId,fullName ,newemailId} = req.body;
@@ -400,7 +430,6 @@ async getAll(req: Request, res: Response) {
     async postImage(req: Request, res: Response) {
         try {
             
-           
             await codeController.postImage({
             
     

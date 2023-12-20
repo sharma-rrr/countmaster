@@ -25,7 +25,7 @@ module.exports = (sequelize:any, DataTypes:any) => {
   User.init({
     uniqueid:{type:DataTypes.STRING},
     playlable: {type:DataTypes.INTEGER},
-    purchaseapp: {type:DataTypes.BOOLEAN,defaultValue:0},
+    purchaseapp:{type:DataTypes.BOOLEAN,defaultValue:0},
  
   }, {
     sequelize,

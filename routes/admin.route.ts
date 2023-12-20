@@ -17,22 +17,14 @@ import express from 'express';
  })
 
 const router=express.Router()
-
 // admin api 
-
-router.post("/getallusers",userController.getuser);
-
-
-// getall count show and total click count of particular users
-// and get all users data and total count  users and total today users count
-router.post("/getuserscount",userController.gettotalcount);
-
-
 //get all data from average table
 router.post("/gettotal",userController.totaldata);
 
 // get  all user and get total users count and  get today USER demo
 router.post("/getdatatotaluser",userController.gettotalusers);
+
+
 
 
 

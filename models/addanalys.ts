@@ -22,14 +22,15 @@ module.exports = (sequelize:any, DataTypes:any) => {
       // define association here
     }
   };
-  addlis.init({
+  addlis.init({                                                           
     userid:{type:DataTypes.INTEGER,},
     show: {type:DataTypes.INTEGER},
-    click: {type:DataTypes.INTEGER},
+    click:{type:DataTypes.INTEGER},
  
   }, {
     sequelize,
     modelName: 'Add',
   });
+  
   return  addlis;
 };

@@ -8,19 +8,6 @@ const multer = require('multer');
 const { uuidv4 } = require('uuid');
 const crypto = require('crypto');
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 import bcryptjs = require("bcryptjs");
 bcryptjs.genSalt(10, function (err, salt) {
     bcryptjs.hash("B4c0/\/", salt, function (err, hash) {
@@ -38,16 +25,18 @@ import commonController from '../common/common.controller';
 // import { body, Result } from 'express-validator';
 import { exists, readSync } from 'fs';
 import { Encrypt } from '../common/encryptpassword';
-import { error } from 'console';
+import { error, log } from 'console';
 import { TokenExpiredError } from 'jsonwebtoken';
 import { ResolveOptions } from 'dns';
 import { rejects } from 'assert';
 import { data } from 'jquery';
 import { and } from 'sequelize';
+import { pathToFileURL } from 'url';
 class CodeController {
-
     ///Section User Start
+    
 //   add api
+
 async addNewUser(payload: any, res: Response) {
     const { id, uniqueid,purchaseapp } = payload;
     try {
@@ -88,6 +77,8 @@ async updatedata(payload:any,res:Response){
             where:{
                 uniqueid
             }
+
+
         })
         console.log(sun,"dhhjh")
         if(uniqueid){
@@ -95,7 +86,7 @@ async updatedata(payload:any,res:Response){
                 purchaseapp,playlable
             })
             commonController.successMessage(sun,"update data sucefuuly",res)
-        }else{
+        } else{
             commonController.successMessage({},"data not update sucefully",res)
         }
     }catch(error){
@@ -106,10 +97,11 @@ async updatedata(payload:any,res:Response){
 
 // Add playtime data 
 async playtime(payload: any, res: Response) {
-    const { uniqueid,id, time} = payload;
+    const {uniqueid,id, time} = payload;
     try {
         const sun=await db.Users.findOne({
             where:{
+
                 uniqueid
             }
         })
@@ -117,14 +109,17 @@ async playtime(payload: any, res: Response) {
        if(!sun){
        commonController.successMessage({},"unique id not found",res) 
    }
+
       else{
         const newPlaytimeEntry = await db.Averagetime.create({
             userid:sun.id,
              time
         });
+
         commonController.successMessage(newPlaytimeEntry, "Playtime added successfully", res);
       }  
       
+
     } catch (error) {
         console.error(error);
         commonController.errorMessage("An error occurred", res);
@@ -144,16 +139,20 @@ async clickdata(payload:any,res:Response){
          })
          if(!moon){
             commonController.successMessage({},"unique id not found",res)
+            return
          }
             const sun=await db.Add.create({
                 userid:moon.id,show,click
                 })
              commonController.successMessage(sun," show and click data add ",res)
       
-      }catch(err){
+      }
+      catch(err){
         commonController.errorMessage("occured error",res)
       }
 }
+
+
 
 // get all data 
 async dataget(payload:any,res:Response){
@@ -177,13 +176,11 @@ async dataget(payload:any,res:Response){
             console.error("Error occurred while fetching data:", error);
           commonController.errorMessage("error occuerd",res)
         }
-    
 
 }
     
 
 // admin login api 
-
 async adminlogin(payload:any,res:Response){
     const{email,password,}=payload;
     console.log(payload,"sdffggggff")
@@ -191,15 +188,11 @@ async adminlogin(payload:any,res:Response){
         if (email === 'admin@mail.com' && password === 'admin123') {
             const token = jwt.sign({
                 email,admin:true,
-
             }, process.env.TOKEN_SECRET);
             commonController.successMessage(token,"token created",res)
-
         } else {
-
             commonController.errorMessage( 'Invalid email or password' ,res);
         }
-        
     }catch(error){
         commonController.errorMessage("occuerd error",res)
     }
@@ -226,7 +219,7 @@ async userlogin(payload: any, res: Response) {
 
                 commonController.successMessage(token, "User login", res);
             } else {
-            
+
                 commonController.errorMessage("Invalid password", res);
             }
         } else {
@@ -246,12 +239,14 @@ async  getallusers(payload, res) {
     var sql = `SELECT * FROM Users WHERE purchaseapp = 1`;
     var data = await MyQuery.query(sql, { type: QueryTypes.SELECT });
        commonController.successMessage(data,"get  purchase data ",res)
-      
   } catch (error) {
     console.error('Error:', error);
     commonController.errorMessage('An error occurred', res);
   }
 }
+
+
+
 
 
 // get particular data users and total show and count data  both tables get data ADDS AND USERS
@@ -292,6 +287,31 @@ GROUP BY
     }
 }
 
+// filter funtion
+async  filter(payload, res) {
+    try {
+        const age = [7, 18, 32, 66, 76];
+        const adultAges = age.filter(age => age >= 18); // Filter ages 18 and above
+        console.log("Adult ages:", adultAges);
+
+        const number = [55, 66, 2, 4, 7, 88, 11];
+        const moon = number.filter(num => num < 10);
+        console.log("num......", moon); 
+
+        const a = ["apple", "aa", "app", "bhb", "dgg", "hj"];
+        const filteredA = a.filter(item => item.includes("a")); 
+        console.log("Filtered array:", filteredA);
+
+ 
+         const user=["shiva","gori","krishna","radha","Ss","ssaa","ssaaww"]
+         const get=user.filter(user=>user.includes("ss"));
+         console.log("get....",get)
+        commonController.successMessage({ moon, adultAges, filteredA,get }, "get data", res);
+    } catch (error) {
+        commonController.errorMessage("An error occurred", res);
+    }
+}
+
 
 
 
@@ -305,17 +325,23 @@ async getTime(payload: any, res: Response) {
         where:{
             uniqueid:id
         }
+
        })
        
        if(!sun){
         commonController.errorMessage("data not found",res)
        }
+
+
         const moon=await db.Averagetime.findAll({
             where:{
                 userid:sun.id
+         
             }
         })
+
         commonController.successMessage(moon, " data successfully", res);
+
     } catch (error) {
         console.error('Error:', error);
         commonController.errorMessage("An error occurred", res);
@@ -327,13 +353,16 @@ async getTime(payload: any, res: Response) {
 // get all users count
 async  getusers(payload: any, res: Response) {
     try {
+
         // Query to get all user data
         const allUsersSQL = `SELECT * FROM Users`;
         const allUsersData = await MyQuery.query(allUsersSQL,{ type: QueryTypes.SELECT });
 
+
         // Query to get the total count of users
         const totalUsersSQL = `SELECT count(*) AS total FROM Users`;
-        const totalUsersData = await MyQuery.query(totalUsersSQL, { type: QueryTypes.SELECT });
+        const totalUsersData = await MyQuery.query(totalUsersSQL,{ type: QueryTypes.SELECT });
+
 
         // Query to get the count of users created today
         const todayDate = new Date().toISOString().split('T')[0];
@@ -345,12 +374,14 @@ async  getusers(payload: any, res: Response) {
             allUsers: allUsersData,
             totalUsersData,todayUsersData
         };
+
         // Send the combined response
         commonController.successMessage(responseData, "User data and counts", res);
     } catch (error) {
         commonController.errorMessage("An error occurred", res);
     }
 }
+
 
 
 
@@ -367,24 +398,31 @@ async changeEmail(payload:any,res:Response){
                 email
             }
         })
+
         if(moon){
             await moon.update({
                 email:newemail,active:0
+
             })
             commonController.successMessage(moon,"change email adrees sucsfuuly",res)
-        }else{
+        }
+        
+
+        else{
+
             commonController.errorMessage("email adress not sucesfully change",res)
         }
     
     }catch(error){
         commonController.errorMessage("occuerd error",res)
+        
     }
      
-      
-}
+    }
+
+  
 
 // password change 
-
 async passwordchange(payload: any, res: Response) {
     const { id, password, newPassword } = payload;
     console.log("hjhj",payload)
@@ -394,7 +432,6 @@ async passwordchange(payload: any, res: Response) {
                 id: 1 
             }
         });
-
         if (userData) { 
             if (password === userData.password) {
                 await userData.update({
@@ -414,9 +451,8 @@ async passwordchange(payload: any, res: Response) {
     }
 }
 
-
-
-
+ 
+// verify otp with email
         async verify(payload: any, res: Response) {
             try {
                 const { email,otp} = payload;
@@ -444,9 +480,16 @@ async passwordchange(payload: any, res: Response) {
                     }
                 }
             } catch (e) {
-                commonController.errorMessage;
+                commonController.errorMessage("occuerd error",res)
             }
         }
+
+
+
+
+
+
+
 
     // login user
     async loginUser(payload: any, res: Response) {
@@ -459,17 +502,14 @@ async passwordchange(payload: any, res: Response) {
 
             }
         })
-
         if (checkdata) {
             if (await Encrypt.comparePassword(password.toString(), checkdata.password.toString())) {
-
                 const token = jwt.sign({
                     email,
                     name: checkdata.fullName,
                     emailVerfied: checkdata.isEmailVerfied,
 
                 }, process.env.TOKEN_SECRET);
-
                 commonController.successMessage(token, "User login", res)
             } else {
                 commonController.errorMessage("INvalid Details", res)
@@ -478,16 +518,14 @@ async passwordchange(payload: any, res: Response) {
         else {
             commonController.errorMessage("Email password not match", res)
             console.log("no");
-
-
         }
     }
-    // verify user
 
+
+    // verify user
     async verifyUser(payload: any, res: Response) {
         try {
             const { id, otp } = payload;
-
             var checkOtp = await db.UserOtps.findOne({
                 where: {
                     userId: id,
@@ -495,10 +533,8 @@ async passwordchange(payload: any, res: Response) {
 
                 }
             })
-
             if (checkOtp) {
                 if (checkOtp.otpValue == otp) {
-
                     await checkOtp.update({ active: false });
                     commonController.successMessage({}, "Otp Verified", res)
 
@@ -507,11 +543,11 @@ async passwordchange(payload: any, res: Response) {
                 }
             }
         } catch (e) {
-            commonController.errorMessage;
+            commonController.errorMessage("occuerd error",res)
         }
     }
 
-    //forgot Password
+
 
     async forgotPassword(payload: any, res: Response) {
         const { emailId } = payload;
@@ -526,19 +562,20 @@ async passwordchange(payload: any, res: Response) {
             //Generate Code
             var otp = commonController.generateOtp();
             console.log(otp);
-
             await db.UserOtps.create({
                 otpValue: otp,
             })
             console.log(otp);
             await commonController.sendEmail(emailId, 'Your Email OTP To Reset Password', '<h1>Hi User  </h1><br> <p> Your email one time password (OTP) to reset password is ' + otp);
             commonController.successMessage(emailId, "link send  sucessfully", res)
-        } else {
+        } 
+        else {
             console.log("not found");
         }
     }
-    // // updatePassword
 
+
+    // // updatePassword
     async updatePassword(payload: any, res: Response) {
         try {
             const { emailId, otp, password } = payload;
@@ -555,20 +592,18 @@ async passwordchange(payload: any, res: Response) {
                 if (checkOtp.otpValue == otp) {
 
                     commonController.successMessage({}, "Otp Verified", res)
-
-
                 }
                 else {
                     commonController.errorMessage("Invalid OTP", res)
-
-                }
+              }
             }
         } catch (e) {
-            commonController.errorMessage;
+            commonController.errorMessage("occuerd error",res)
         }
     }
-    // new password
 
+
+    // new password
     async newPassword(payload: any, res: Response) {
         const { emailId, password } = payload;
         //Check If Email Exists
@@ -577,23 +612,16 @@ async passwordchange(payload: any, res: Response) {
             where: {
                 emailId,
 
-
-
             }
         })
         console.log(emailId);
         if (checkdata) {
             var hash = await Encrypt.cryptPassword(password.toString());
-
             var result = await checkdata.update({
-
                 password: hash,
 
             })
             commonController.successMessage(emailId, "password update  sucessfully", res)
-
-
-
 
         } else {
             commonController.errorMessage("password not update", res)
@@ -635,7 +663,6 @@ async passwordchange(payload: any, res: Response) {
     async updateProfile(payload: any, res: Response) {
         const { emailId, fullName, newemailId } = payload;
         //Check If Email Exists
-
         var checkdata = await db.Users.findOne({
             where: {
                 emailId
@@ -651,13 +678,14 @@ async passwordchange(payload: any, res: Response) {
             commonController.successMessage(checkdata, "data updated sucessfully", res)
             console.log(checkdata.emailId);
         } else {
-            commonController.errorMessage("data not update", res)
-          
+            commonController.errorMessage("data not update", res)       
         }
     }
 
+
+
     // change Password
-   
+
     async changePassword(payload: any, res: Response) {
         const { id, password ,newPassword} = payload;
         var hash = await Encrypt.cryptPassword(password.toString());
@@ -686,23 +714,24 @@ async passwordchange(payload: any, res: Response) {
                  commonController.successMessage(id, "Password changed successfully", res)
                 
             } else {
+
                 commonController.errorMessage("INvalid Details", res)
             }
+
         }
+
         else {
+
             commonController.errorMessage("Email password not match", res)
             console.log("no");
         }
 } 
-        // find all users
 
+        // find all users
         async getAll(payload: any, res: Response) {
-            
             var checkdata = await db.Users.findAll({
-                
             })
             if (checkdata) {
-               
                 commonController.successMessage(checkdata, "data get  sucessfully", res)
     
                 // console.log(checkdata);
@@ -761,7 +790,6 @@ async passwordchange(payload: any, res: Response) {
     }
 
     //qr code 
-
    async qrCode(payload: any, res: Response) {
   const generateQR = async (text) => {
     try {
@@ -773,7 +801,6 @@ async passwordchange(payload: any, res: Response) {
       console.log(e);
     }
   };
-
   await generateQR("http://google.com");
 }
  
@@ -793,8 +820,6 @@ async postImage(req: any, res: any) {
         );
     
     }
- 
-  
         commonController.successMessage(req.file.path, "image upload succesfully", res);
       } catch (e) {
         commonController.errorMessage("image not upload oops!", res);
