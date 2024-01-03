@@ -6,6 +6,7 @@ interface UserAttributes{
 uniqueid:string;
 purchaseapp:boolean;
 playlable:number;
+playtime:number
 }
 module.exports = (sequelize:any, DataTypes:any) => {
   class  User extends Model<UserAttributes>
@@ -13,6 +14,7 @@ module.exports = (sequelize:any, DataTypes:any) => {
     uniqueid!:string;
     purchaseapp!:boolean;
     playlable!:number;
+    playtime!:number
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -26,6 +28,7 @@ module.exports = (sequelize:any, DataTypes:any) => {
     uniqueid:{type:DataTypes.STRING},
     playlable: {type:DataTypes.INTEGER},
     purchaseapp:{type:DataTypes.BOOLEAN,defaultValue:0},
+    playtime: {type:DataTypes.INTEGER,defaultValue:0},
  
   }, {
     sequelize,

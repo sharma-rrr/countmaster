@@ -1,6 +1,5 @@
 import { verify } from 'crypto';
 import express from 'express';
-
  import userController from "../controllers/user.controller";
 
  const multer = require("multer");
@@ -10,6 +9,8 @@ import express from 'express';
   },
   filename: function(req:any, file: any, cb: any) {
     cb(null, file.originalname + ".png");
+
+    
   },
  });
  var upload = multer({
@@ -28,6 +29,10 @@ const router=express.Router();
 
  // get all time count particular users try
  router.post("/get",userController.getdata);
+
+ 
+
+
 
 
 
@@ -61,8 +66,8 @@ router.post("/getallusers",userController.getuser);
 router.post("/getuserscount",userController.gettotalcount);
 
 
-// /
-router.post("/filter",userController.filter);
+
+router.post("/filter",userController.filteer);
 
 
    

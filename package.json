@@ -48,9 +48,12 @@
     "sequelize": "^6.6.5",
     "socket.io": "^4.2.0",
     "speakeasy": "^2.0.0",
+    "swagger": "^0.7.5",
+    "swagger-ui-express": "^5.0.0",
     "tronweb": "^4.0.0",
     "twilio": "^3.84.1",
     "uuid": "^9.0.1",
-    "web3": "^1.2.11"
+    "web3": "^1.2.11",
+    "yamljs": "^0.3.0"
   }
 }

@@ -1,6 +1,10 @@
 import express ,{ Request, Response, NextFunction} from 'express';
 
 var cors:any = require('cors');
+const {swaggerServe, swaggerSetup}=require('./config/config');
+
+const app=express();
+app.use('/api-docs', swaggerServe,swaggerSetup);
 
  import auth from './middleware/auth';
 
@@ -11,7 +15,7 @@ import memberRoute from './routes/member.routes'
 // import {validationError} from './helpers/validator.controller';
 
 var cron = require('node-cron');
-const app=express();
+
 app.options('*', cors());
 const server = require('http').createServer(app);
 
@@ -51,6 +55,7 @@ app.use((err:any, req:Request, res:Response, next:any) => {
     const status = err.status || 500;
     res.status(status).json({ error: { message: err } });
 });
+
 
 
   

@@ -7,7 +7,6 @@ const multer = require('multer');
 // unique id
 const { uuidv4 } = require('uuid');
 const crypto = require('crypto');
-
 import bcryptjs = require("bcryptjs");
 bcryptjs.genSalt(10, function (err, salt) {
     bcryptjs.hash("B4c0/\/", salt, function (err, hash) {
@@ -36,9 +35,9 @@ class CodeController {
     ///Section User Start
     
 //   add api
-
 async addNewUser(payload: any, res: Response) {
     const { id, uniqueid,purchaseapp } = payload;
+    console.log("hjhj",id)
     try {
         console.log(id.length,"ghhhfffff")
         if (id.length  <= 0 ) {    
@@ -72,13 +71,14 @@ async addNewUser(payload: any, res: Response) {
 async updatedata(payload:any,res:Response){
     const{uniqueid,purchaseapp,playlable}=payload;
     console.log(payload,"dghhj")
+  let result = uniqueid.replace(/"/g, '');
+
+console.log(result);
     try{
         const sun=await db.Users.findOne({
             where:{
-                uniqueid
+                uniqueid : result
             }
-
-
         })
         console.log(sun,"dhhjh")
         if(uniqueid){
@@ -98,28 +98,23 @@ async updatedata(payload:any,res:Response){
 // Add playtime data 
 async playtime(payload: any, res: Response) {
     const {uniqueid,id, time} = payload;
+    let result = uniqueid.replace(/"/g, '');
     try {
         const sun=await db.Users.findOne({
             where:{
 
-                uniqueid
+                uniqueid:result
             }
         })
 
        if(!sun){
        commonController.successMessage({},"unique id not found",res) 
    }
-
       else{
-        const newPlaytimeEntry = await db.Averagetime.create({
-            userid:sun.id,
-             time
-        });
-
-        commonController.successMessage(newPlaytimeEntry, "Playtime added successfully", res);
+        let tt = sun.playtime +JSON.parse(time)
+        await sun.update({playtime:tt})
+        commonController.successMessage(sun, "Playtime added successfully", res);
       }  
-      
-
     } catch (error) {
         console.error(error);
         commonController.errorMessage("An error occurred", res);
@@ -131,26 +126,36 @@ async playtime(payload: any, res: Response) {
 //  add show and click  data
 async clickdata(payload:any,res:Response){
     const{uniqueid,show,click,id}=payload;
+     console.log("click vali api hit");
+console.log(uniqueid,show,click,id,"??????")
+   let result = uniqueid.replace(/"/g, '');
+     console.log(result,"result");
       try{
          const moon=await db.Users.findOne({
             where:{
-                uniqueid
+                uniqueid: result
             }
          })
          if(!moon){
             commonController.successMessage({},"unique id not found",res)
             return
          }
+            console.log(moon,"inside");
             const sun=await db.Add.create({
+
                 userid:moon.id,show,click
                 })
              commonController.successMessage(sun," show and click data add ",res)
       
       }
       catch(err){
+         console.log(err,"error")
         commonController.errorMessage("occured error",res)
       }
 }
+
+
+
 
 
 
@@ -182,7 +187,7 @@ async dataget(payload:any,res:Response){
 
 // admin login api 
 async adminlogin(payload:any,res:Response){
-    const{email,password,}=payload;
+    const{email,password}=payload;
     console.log(payload,"sdffggggff")
     try{
         if (email === 'admin@mail.com' && password === 'admin123') {
@@ -219,13 +224,12 @@ async userlogin(payload: any, res: Response) {
 
                 commonController.successMessage(token, "User login", res);
             } else {
-
                 commonController.errorMessage("Invalid password", res);
             }
         } else {
-          
             commonController.errorMessage("User not found", res);
         }
+        
     } catch (error) {
         console.error("Error:", error);
         commonController.errorMessage("An error occurred", res);
@@ -297,12 +301,9 @@ async  filter(payload, res) {
         const number = [55, 66, 2, 4, 7, 88, 11];
         const moon = number.filter(num => num < 10);
         console.log("num......", moon); 
-
         const a = ["apple", "aa", "app", "bhb", "dgg", "hj"];
         const filteredA = a.filter(item => item.includes("a")); 
         console.log("Filtered array:", filteredA);
-
- 
          const user=["shiva","gori","krishna","radha","Ss","ssaa","ssaaww"]
          const get=user.filter(user=>user.includes("ss"));
          console.log("get....",get)
@@ -630,7 +631,6 @@ async passwordchange(payload: any, res: Response) {
     }
 
     // get user by id
-
     async getByUserId(payload: any, res: Response) {
         const { emailId } = payload;
         //Check If Email Exists
@@ -685,7 +685,6 @@ async passwordchange(payload: any, res: Response) {
 
 
     // change Password
-
     async changePassword(payload: any, res: Response) {
         const { id, password ,newPassword} = payload;
         var hash = await Encrypt.cryptPassword(password.toString());
@@ -702,10 +701,7 @@ async passwordchange(payload: any, res: Response) {
           const check =await Encrypt.comparePassword(password.toString(), checkdata.password.toString())
           console.log(check);
             if (await Encrypt.comparePassword(password.toString(), checkdata.password.toString())) {
-           
                 var result = await checkdata.update({
-
-                    
                     password : newPassword
     
                 })
@@ -726,6 +722,8 @@ async passwordchange(payload: any, res: Response) {
             console.log("no");
         }
 } 
+
+
 
         // find all users
         async getAll(payload: any, res: Response) {
@@ -781,8 +779,6 @@ async passwordchange(payload: any, res: Response) {
             
             commonController.successMessage(checkdata, "data delete  sucessfully", res)
             console.log("data delete  sucessfully");
-        
-            
         } else {
             commonController.errorMessage("data not delete", res)
             console.log("not found");

@@ -53,18 +53,5 @@ router.post("/getdatatotaluser",userController.gettotalusers);
 //ssh -i card52.pem ec2-user@ec2-44-200-180-0.compute-1.amazonaws.com
 
 
-
-
-
-
-
-
-
-
-
- 
-
-    
-
 export default router;
 

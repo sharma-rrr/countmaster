@@ -1,0 +1,291 @@
+openapi: 3.0.0
+info:
+  title: Your API
+  description: Your API description
+  version: 1.0.0
+
+servers:
+  - url: http://44.200.180.0:7777
+    description: Local server
+
+paths:
+  /api/v1/auth/register:
+    post:
+      tags:
+        - User registration
+      summary: ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  minLength: 1
+                  description: Unique ID of the user
+              required:
+                - id
+      responses:
+        '200':
+          description: OK
+
+  /api/v1/auth/updatepurchaseapp:
+    post:
+      tags:
+        - Update purchase app one
+      summary: Update purchase app details
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                uniqueid:
+                  type: string
+                  minLength: 1
+                  description: Unique ID of the user
+                purchaseapp:
+                  type: boolean
+                  description: Indicates if the app was purchased
+                playlable:
+                  type: number
+                  description: The play label (assuming it's a numeric value)
+              required:
+                - uniqueid
+                - purchaseapp
+                - playlable
+      responses:
+        '200':
+          description: OK
+
+  /api/v1/auth/addplaytime:
+    post:
+      tags:
+        - Playtime
+      summary: User's playtime details
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                uniqueid:
+                  type: string
+                  minLength: 1
+                  description: Unique ID of the user
+                time:
+                  type: number
+                  description: Time to be added to user's playtime
+              required:
+                - uniqueid
+                - time
+      responses:
+        '200':
+          description: OK
+
+  /api/v1/auth/playshow:
+    post:
+      tags:
+        - Add show and click
+      summary: User click and show
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                uniqueid:
+                  type: string
+                  minLength: 1
+                  description: Unique ID of the user
+                show:
+                  type: number
+                  description: Number of times the show is viewed
+                click:
+                  type: number
+                  description: Number of times the user clicked
+              required:
+                - uniqueid
+                - show
+                - click
+      responses:
+        '200':
+          description: OK
+  
+  /api/v1/auth/adminlogin:
+    post:
+      tags:
+        - Admin API's
+      summary: Admin login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  minLength: 1
+                  description: Unique ID of the user
+                password:
+                  type: string
+                  description: Number of times the show is viewed
+              required:
+                - password
+                - email
+      responses:
+        '200':
+          description: OK
+
+  /api/v1/auth/adminuserlogin:
+    post:
+      tags:
+        - Admin API's
+      summary: Admin user login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  minLength: 1
+                  description: Unique ID of the user
+                password:
+                  type: string
+                  description: Number of times the show is viewed
+              required:
+                - password
+                - email
+      responses:
+        '200':
+          description: OK 
+
+  /api/v1/auth/changeemail:
+    post:
+      tags:
+        - Change admin email
+      summary: Change admin email
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  minLength: 1
+                  description: Existing email of the user
+                newemail:
+                  type: string
+                  description: New email for the user
+              required:
+                - email
+                - newemail
+      responses:
+        '200':
+          description: OK
+  
+  /api/v1/auth/change:
+    post:
+      tags:
+        - Change password
+      summary: Change password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                  minLength: 1
+                  description: Existing password of the admin
+                newPassword:
+                  type: string
+                  description: New password for the admin
+                id:
+                  type: number
+                  description: New password for the admin
+              required:
+                - password
+                - newPassword
+                - id
+      responses:
+        '200':
+          description: OK
+   
+  /api/v1/auth/getallusers:
+    post:
+      tags:
+        - Users
+      summary: Retrieve all users
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object  
+
+  /api/v1/auth/getuserscount:
+    post:
+      tags:
+        - get total user details 
+      summary: Retrieve all users
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object  
+
+  /api/v1/admin/gettotal:
+    post:
+      security:
+        - JWT: []  # Apply JWT security defined above
+      tags:
+        - Get all data from average table
+      summary: Get total time entry for a user
+      parameters:
+        - in: header
+          name: access_token
+          required: true
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  minimum: 1
+                  description: Unique ID of the user
+              required:
+                - id
+      responses:
+        '200':
+          description: OK
+
+components:
+  securitySchemes:  
+    JWT:  
+      type: http  
+      in: header  
+      name: authentication
+
+
+  

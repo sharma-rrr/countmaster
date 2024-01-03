@@ -23,6 +23,7 @@ class UserController {
 
 
     // update user data 
+
     async update(req: Request, res: Response) {
         try {
             const {uniqueid,purchaseapp,playlable} = req.body;
@@ -93,6 +94,7 @@ async adminlogin(req:Request,res:Response){
     }
 }
 
+
  async userlogin(req:Request,res:Response){
     try{
         const{email,password}=req.body;
@@ -107,7 +109,6 @@ async adminlogin(req:Request,res:Response){
 
 
 // get all users 
-
 async getuser(req:Request,res:Response){
     try{
         await codeController.getallusers({
@@ -131,11 +132,10 @@ async gettotalcount(req:Request,res:Response){
 }
 
 // 
-async filter(req:Request,res:Response){
+async filteer(req:Request,res:Response){
     try{
 
         await codeController.filter({
-
 
         },res)
 
@@ -166,16 +166,8 @@ async gettotalusers(req:Request,res:Response){
     await codeController.getusers({
         
     },res)
+
 }
-
-
-
-
-
-
-
-
-
 
 
 
@@ -193,17 +185,16 @@ async changeEmail(req:Request,res:Response){
   
   }
 
+
+
   
   // change password
   async Passwordchange(req:Request,res:Response){
     try{
-
         const{id,password,newPassword,}=req.body;
         await codeController.passwordchange({
         password,newPassword,id
         },res)
-
-
     }catch(error){
         commonController.errorMessage("occuerd error",res)
     }
