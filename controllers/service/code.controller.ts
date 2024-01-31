@@ -1,5 +1,5 @@
 import { hash, hashSync } from 'bcryptjs';
-import { Request, Response } from 'express';
+import { Request, Response, response } from 'express';
 let referralCodeGenerator = require('referral-code-generator');
 var otpGenerator = require('otp-generator');
 const QRCode = require('qrcode');
@@ -13,6 +13,7 @@ bcryptjs.genSalt(10, function (err, salt) {
         // Store hash in your password DB.
     });
 });
+
 
 
 import db from "../../models"
@@ -31,6 +32,7 @@ import { rejects } from 'assert';
 import { data } from 'jquery';
 import { and } from 'sequelize';
 import { pathToFileURL } from 'url';
+import { PayloadContext } from 'twilio/lib/rest/api/v2010/account/recording/addOnResult/payload';
 class CodeController {
     ///Section User Start
     
@@ -72,7 +74,6 @@ async updatedata(payload:any,res:Response){
     const{uniqueid,purchaseapp,playlable}=payload;
     console.log(payload,"dghhj")
   let result = uniqueid.replace(/"/g, '');
-
 console.log(result);
     try{
         const sun=await db.Users.findOne({
@@ -86,7 +87,7 @@ console.log(result);
                 purchaseapp,playlable
             })
             commonController.successMessage(sun,"update data sucefuuly",res)
-        } else{
+        }else{
             commonController.successMessage({},"data not update sucefully",res)
         }
     }catch(error){
@@ -102,7 +103,6 @@ async playtime(payload: any, res: Response) {
     try {
         const sun=await db.Users.findOne({
             where:{
-
                 uniqueid:result
             }
         })
@@ -124,7 +124,7 @@ async playtime(payload: any, res: Response) {
 
 
 //  add show and click  data
-async clickdata(payload:any,res:Response){
+async clickdata(payload:any,res:Response){ 
     const{uniqueid,show,click,id}=payload;
      console.log("click vali api hit");
 console.log(uniqueid,show,click,id,"??????")
@@ -142,18 +142,15 @@ console.log(uniqueid,show,click,id,"??????")
          }
             console.log(moon,"inside");
             const sun=await db.Add.create({
-
                 userid:moon.id,show,click
                 })
              commonController.successMessage(sun," show and click data add ",res)
-      
       }
       catch(err){
          console.log(err,"error")
         commonController.errorMessage("occured error",res)
       }
 }
-
 
 
 
@@ -183,7 +180,44 @@ async dataget(payload:any,res:Response){
         }
 
 }
-    
+    //
+    async addData (payload:any,res:Response){
+        const{avatar}=payload;
+        try{
+          const moon=await db.avatars.create({
+            avatar
+          })
+          commonController.successMessage(moon,"data  add ",res)
+
+        }catch(error){
+            commonController.errorMessage("occuerd error",res)
+        }
+
+    }
+
+    // get data from avtar table
+    async getdata(payload:any,res:Response){
+        const{id}=payload;
+        console.log("idpayload",payload)
+       
+    try {
+      const sql = `SELECT * FROM avatars WHERE id = :id`; 
+      const result = await MyQuery.query(sql, { type: QueryTypes.SELECT,
+        replacements: { id: id },
+      });
+
+      if (result && result.length > 0) {
+          commonController.successMessage(result, "Data retrieved successfully", res);
+      } else {
+          commonController.errorMessage("No data found for the given id", res);
+      }
+  } catch (err) {
+      console.error(err);
+      commonController.errorMessage("occuerd error", res);
+  }
+}
+
+
 
 // admin login api 
 async adminlogin(payload:any,res:Response){
@@ -214,7 +248,6 @@ async userlogin(payload: any, res: Response) {
                 email
             }
         });
-
         if (userData) {
             if (userData.password == password) {
                 const token = jwt.sign({
@@ -296,8 +329,7 @@ async  filter(payload, res) {
     try {
         const age = [7, 18, 32, 66, 76];
         const adultAges = age.filter(age => age >= 18); // Filter ages 18 and above
-        console.log("Adult ages:", adultAges);
-
+        console.log("Adult ages:", adultAges)
         const number = [55, 66, 2, 4, 7, 88, 11];
         const moon = number.filter(num => num < 10);
         console.log("num......", moon); 
@@ -324,25 +356,21 @@ async getTime(payload: any, res: Response) {
     try {
        const sun=await db.Users.findOne({
         where:{
-            uniqueid:id
+               uniqueid:id
         }
 
        })
-       
+    
        if(!sun){
         commonController.errorMessage("data not found",res)
        }
-
-
         const moon=await db.Averagetime.findAll({
             where:{
                 userid:sun.id
          
             }
         })
-
         commonController.successMessage(moon, " data successfully", res);
-
     } catch (error) {
         console.error('Error:', error);
         commonController.errorMessage("An error occurred", res);
@@ -354,7 +382,6 @@ async getTime(payload: any, res: Response) {
 // get all users count
 async  getusers(payload: any, res: Response) {
     try {
-
         // Query to get all user data
         const allUsersSQL = `SELECT * FROM Users`;
         const allUsersData = await MyQuery.query(allUsersSQL,{ type: QueryTypes.SELECT });
@@ -375,7 +402,6 @@ async  getusers(payload: any, res: Response) {
             allUsers: allUsersData,
             totalUsersData,todayUsersData
         };
-
         // Send the combined response
         commonController.successMessage(responseData, "User data and counts", res);
     } catch (error) {
@@ -407,8 +433,6 @@ async changeEmail(payload:any,res:Response){
             })
             commonController.successMessage(moon,"change email adrees sucsfuuly",res)
         }
-        
-
         else{
 
             commonController.errorMessage("email adress not sucesfully change",res)
@@ -575,6 +599,7 @@ async passwordchange(payload: any, res: Response) {
         }
     }
 
+ 
 
     // // updatePassword
     async updatePassword(payload: any, res: Response) {
@@ -670,7 +695,6 @@ async passwordchange(payload: any, res: Response) {
         })
         if (checkdata) {
             var result = await checkdata.update({
-
                 fullName,
                 emailId: newemailId
 
@@ -681,6 +705,11 @@ async passwordchange(payload: any, res: Response) {
             commonController.errorMessage("data not update", res)       
         }
     }
+
+
+
+
+
 
 
 
@@ -717,7 +746,6 @@ async passwordchange(payload: any, res: Response) {
         }
 
         else {
-
             commonController.errorMessage("Email password not match", res)
             console.log("no");
         }
@@ -731,7 +759,6 @@ async passwordchange(payload: any, res: Response) {
             })
             if (checkdata) {
                 commonController.successMessage(checkdata, "data get  sucessfully", res)
-    
                 // console.log(checkdata);
             } else {
                 commonController.errorMessage("data not get", res)
@@ -822,8 +849,14 @@ async postImage(req: any, res: any) {
         console.log(e);
       }
     }
+
+
+ 
+
+    
 }
-  
+
+
   
 
 export default new CodeController();

@@ -1,9 +1,11 @@
-import { Request, Response } from 'express';
+import { Request, Response, response } from 'express';
 import codeController from './service/code.controller';
 import commonController from './common/common.controller';
 import { sign, verify } from 'crypto';
 import { Pay } from 'twilio/lib/twiml/VoiceResponse';
 // import userController from "../controllers/user.controller";
+import { error } from 'console';
+import { PayloadContext } from 'twilio/lib/rest/api/v2010/account/recording/addOnResult/payload';
 class UserController {
     // add api 
     async   register(req: Request, res: Response) {
@@ -66,6 +68,7 @@ async showdata(req:Request,res:Response){
     }
 }
 
+
 // get all particular data  from average time users
 async getdata(req:Request,res:Response){
     try{
@@ -79,7 +82,31 @@ async getdata(req:Request,res:Response){
           }
       }
 
-      
+      async addavtar(req:Request,res:Response){
+        try{
+            const {avatar}=req.body;
+            console.log("avatar..",avatar)
+            await codeController .addData({
+            avatar
+            },res)
+
+        }catch(error){
+            commonController.errorMessage("occuer error",res)
+        }
+      }
+
+      // get data from avtar table
+      async get(req:Request,res:Response){
+        try{
+            const {id}=req.body;
+            await codeController .getdata({
+           id
+            },res)
+        
+        }catch(error){
+            commonController.errorMessage("occuerd error",res)
+        }
+      }
 
 
 // admin login 
@@ -126,19 +153,16 @@ async gettotalcount(req:Request,res:Response){
     await codeController.getallcount({
     },res) 
 }catch(error){
-    
     commonController.errorMessage("occuerd error",res)
 }
 }
 
-// 
+
+
 async filteer(req:Request,res:Response){
     try{
-
         await codeController.filter({
-
         },res)
-
     }catch(error){
         commonController.errorMessage("occuerd error",res)
     }
@@ -175,7 +199,7 @@ async gettotalusers(req:Request,res:Response){
 // change email adrees
 async changeEmail(req:Request,res:Response){
     try{
-      const{email,newemail,}=req.body;
+      const{email,newemail}=req.body;
       await codeController.changeEmail({
           email,newemail
       },res)

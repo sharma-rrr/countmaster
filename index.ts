@@ -24,6 +24,8 @@ app.get("/", function (req,res) {
   res.send("Response from the GET request")
   });
 import db from './models';
+import { hasSubscribers } from 'diagnostics_channel';
+import { homedir } from 'os';
 
 app.use(express.json());
 app.use(express.static('resources'));
@@ -58,7 +60,8 @@ app.use((err:any, req:Request, res:Response, next:any) => {
 
 
 
-  
+
+ 
  db.sequelize.sync().then(()=>{
   server.listen(port,async()=>{
     console.log('App Started');

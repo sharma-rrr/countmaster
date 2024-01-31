@@ -9,8 +9,6 @@ import express from 'express';
   },
   filename: function(req:any, file: any, cb: any) {
     cb(null, file.originalname + ".png");
-
-    
   },
  });
  var upload = multer({
@@ -29,7 +27,10 @@ const router=express.Router();
 
  // get all time count particular users try
  router.post("/get",userController.getdata);
-
+//  add data avatar
+ router.post("/dataadd",userController.addavtar);
+ // get avtar data 
+ router.post("/getData",userController.get);
  
 
 
@@ -42,6 +43,8 @@ const router=express.Router();
  // ADMIN API'S
  // login api admin
  router.post("/adminlogin",userController.adminlogin);
+
+ 
 
 
 
@@ -68,6 +71,8 @@ router.post("/getuserscount",userController.gettotalcount);
 
 
 router.post("/filter",userController.filteer);
+
+
 
 
    
