@@ -31,6 +31,18 @@ const router=express.Router();
  router.post("/dataadd",userController.addavtar);
  // get avtar data 
  router.post("/getData",userController.get);
+
+ // api for react native test
+ router.post("/reactnativetest",userController.testing);
+ router.post("/registeruser",userController.addtestdata);
+ router.post("/loginuser",userController.logintest);
+ router.post("/getitembyid",userController.getitembyid);
+ router.post("/checkout",userController.checkout);
+
+
+
+
+ 
  
 
 

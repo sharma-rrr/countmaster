@@ -6,6 +6,7 @@ import { Pay } from 'twilio/lib/twiml/VoiceResponse';
 // import userController from "../controllers/user.controller";
 import { error } from 'console';
 import { PayloadContext } from 'twilio/lib/rest/api/v2010/account/recording/addOnResult/payload';
+import { data } from 'jquery';
 class UserController {
     // add api 
     async   register(req: Request, res: Response) {
@@ -108,7 +109,77 @@ async getdata(req:Request,res:Response){
         }
       }
 
+// test for reactnative used api
+      async testing(req:Request,res:Response){
+        try{
+      await codeController.testing({
 
+      },res)
+        }catch(error){
+        commonController.errorMessage("occuerd error",res)
+        };
+      }
+      // add data
+      async   addtestdata(req: Request, res: Response) {
+        try {
+
+            const {name,email,password,companyname,adress} = req.body;
+            await codeController.adddata({
+                name,email,password,companyname,adress   
+            }, res)
+        
+                
+        } catch (e) {
+            console.log(e)
+            commonController.errorMessage("user not register", res)
+        }
+    }
+
+    //
+    async   logintest(req: Request, res: Response) {
+        try {
+
+            const {email,password} = req.body;
+            await codeController.logintest({
+                email,password 
+            }, res)
+        
+                
+        } catch (e) {
+            console.log(e)
+            commonController.errorMessage("user not register", res)
+        }
+    }
+    async getitembyid(req: Request, res: Response) {
+        try {
+
+            const {id} = req.body;
+            await codeController.getitembyid({
+              id
+            }, res)
+        
+                
+        } catch (e) {
+            console.log(e)
+            commonController.errorMessage("user not register", res)
+        }
+    }
+    async checkout(req: Request, res: Response) {
+        try {
+
+            const {email,data} = req.body;
+            await codeController.checkout({
+                email,data
+            }, res)
+        
+                
+        } catch (e) {
+            console.log(e)
+            commonController.errorMessage("user not register", res)
+        }
+    }
+
+   
 // admin login 
 async adminlogin(req:Request,res:Response){
     try{

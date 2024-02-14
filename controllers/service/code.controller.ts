@@ -153,6 +153,142 @@ console.log(uniqueid,show,click,id,"??????")
 }
 
 
+//
+async testing(payload: any, res: Response) {
+    try {
+        const sql = `select * from CATERs `; 
+        var data = await MyQuery.query(sql, { type: QueryTypes.SELECT });
+        let myArray: any[] = [];
+        for (let i = 0; i < data.length; i++) {
+            console.log("id here",data[i].id);
+            
+            let stringdata = JSON.stringify(data[i]);
+            QRCode.toDataURL(stringdata, async function (err, code) {
+                if (err) return console.log("error occurred");
+             
+                let myObject = { qrCode: code, value: stringdata,id:data[i].id };
+                myArray.push(myObject);
+                // Check if all QR codes are generated
+                if (myArray.length === data.length) {
+                    commonController.successMessage(myArray, "data send Successfully", res);
+                }
+            });
+        }
+    } catch (e) {
+        console.log(e);
+        commonController.errorMessage("occurred error", res);
+    }
+}
+ 
+
+
+async checkout(payload: any, res: Response) {
+    const {   email,data } = payload;
+    console.log(payload,"pay");
+    try {
+        const moon = await db.CheckOut.create({
+          email,data
+        })
+        commonController.successMessage(moon, "Data is created successfully", res);
+      
+    } catch (error) {
+        console.log(error);
+        
+      commonController.errorMessage("An error occurred", res);
+    }
+  }
+  
+
+
+// add data
+async adddata(payload: any, res: Response) {
+    const { name, email, password, companyname, adress } = payload;
+    console.log(payload,"pay");
+    try {
+      const sun = await db.TESTUSER.findOne({
+        where: {
+            emailid: email
+        }
+      });
+  
+      if (sun) {
+        commonController.errorMessage("Email already exists", res);
+      } else {
+        console.log("else");
+        
+        const moon = await db.TESTUSER.create({
+          name,
+          emailid:  email,
+          password,
+          companyname,
+          adress
+        });
+  
+        commonController.successMessage(moon, "Data is created successfully", res);
+      }
+    } catch (error) {
+        console.log(error);
+        
+      commonController.errorMessage("An error occurred", res);
+    }
+  }
+  
+async getitembyid(payload: any, res: Response) {
+    const { id } = payload;
+   console.log(payload,"dhdjh")
+   try {
+    const sql = `select * from CATERs where id=${id}`; 
+    var data = await MyQuery.query(sql, { type: QueryTypes.SELECT });
+    let myArray: any[] = [];
+    for (let i = 0; i < data.length; i++) {
+        let stringdata = JSON.stringify(data[i]);
+        QRCode.toDataURL(stringdata, async function (err, code) {
+            if (err) return console.log("error occurred");
+            console.log(code, "bhen");
+            let myObject = { qrCode: code, value: stringdata };
+            myArray.push(myObject);
+            // Check if all QR codes are generated
+            if (myArray.length === data.length) {
+                commonController.successMessage(myArray, "data send Successfully", res);
+            }
+        });
+    }
+} catch (e) {
+    console.log(e);
+    commonController.errorMessage("occurred error", res);
+}
+}
+
+
+  async logintest(payload: any, res: Response) {
+    const { email, password, id } = payload;
+    console.log(payload,"dsghsgh")
+    try {
+        const userData = await db.TESTUSER.findOne({
+            where: {
+                emailid:  email
+            }
+        });
+        if (userData) {
+            if (userData.password == password) {
+                const token = jwt.sign({
+                    email,
+                    id:userData.id
+                }, process.env.TOKEN_SECRET);
+
+                commonController.successMessage(token, "User login", res);
+            } else {
+                commonController.errorMessage("Invalid password", res);
+            }
+        } else {
+            commonController.errorMessage("User not found", res);
+        }
+        
+    } catch (error) {
+        console.error("Error:", error);
+        commonController.errorMessage("An error occurred", res);
+    }
+}
 
 
 
@@ -236,6 +372,8 @@ async adminlogin(payload:any,res:Response){
         commonController.errorMessage("occuerd error",res)
     }
 }
+
+
 
 
 //user login
@@ -379,6 +517,7 @@ async getTime(payload: any, res: Response) {
 
 
 
+
 // get all users count
 async  getusers(payload: any, res: Response) {
     try {
@@ -396,7 +535,6 @@ async  getusers(payload: any, res: Response) {
         const todayDate = new Date().toISOString().split('T')[0];
         const todayUsersSQL = `SELECT count(*) AS total FROM Users WHERE DATE(createdAt) = '${todayDate}'`;
         const todayUsersData = await MyQuery.query(todayUsersSQL, { type: QueryTypes.SELECT });
-
         // Prepare the response object with all users data, total count, and today's count
         const responseData = {
             allUsers: allUsersData,
@@ -408,9 +546,6 @@ async  getusers(payload: any, res: Response) {
         commonController.errorMessage("An error occurred", res);
     }
 }
-
-
-
 
 
 
@@ -851,7 +986,6 @@ async postImage(req: any, res: any) {
     }
 
 
- 
 
     
 }
